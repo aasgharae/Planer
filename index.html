@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>نئوپلنر | پلنر ریتم زندگی</title>
+<meta name="description" content="پلنر روزانه نئونی: باشگاه، کتاب، ورزش و عادت‌های زندگی با نمودار پیشرفت" />
+<meta name="theme-color" content="#08081a" />
+<link rel="manifest" href="manifest.json" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
+
+<div class="app">
+<header class="topbar glass">
+<div>
+<div class="logo">⚡ نئوپلنر</div>
+<div id="todayDate" class="date">...</div>
+</div>
+<div class="level-box">
+<div id="levelText" class="level-text">سطح ۱</div>
+<div class="xp-bar"><div id="xpFill"></div></div>
+<div id="streakText" class="streak">🔥 ۰ روز</div>
+</div>
+<button id="installBtn" class="glass-btn hidden">نصب اپ</button>
+</header>
+
+<main>
+<!-- TODAY -->
+<section id="tab-today" class="tab active">
+<div class="hero glass">
+<div class="ring-wrap">
+<svg viewBox="0 0 120 120" class="ring">
+<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#00f5ff"/><stop offset="1" stop-color="#ff2ee6"/></linearGradient></defs>
+<circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="12"/>
+<circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" transform="rotate(-90 60 60)"/>
+</svg>
+<div class="ring-center"><b id="scoreText">۰٪</b><span>انرژی امروز</span></div>
+</div>
+<div class="hero-info">
+<div id="insightBox" class="insight">امروز را شروع کن ✨</div>
+<div class="mini-stats">
+<div><b id="statTasks">۰/۰</b><span>تسک‌ها</span></div>
+<div><b id="statHabits">۰٪</b><span>عادت‌ها</span></div>
+<div><b id="statXp">۰</b><span>امتیاز</span></div>
+</div>
+<button class="neon-btn" onclick="openModal('taskModal')">+ کار جدید</button>
+</div>
+</div>
+
+<div class="section-title">تسک‌های امروز <span id="remainCount"></span></div>
+<div class="filters glass">
+<button data-filter="all" class="active">همه</button>
+<button data-filter="active">فعال</button>
+<button data-filter="done">انجام‌شده</button>
+<button data-filter="gym">🏋️ باشگاه</button>
+<button data-filter="study">📚 مطالعه</button>
+</div>
+<ul id="taskList" class="task-list"></ul>
+
+<div class="section-title">عادت‌های امروز <button class="link-btn" onclick="switchTab('habits')">مدیریت ←</button></div>
+<div id="quickHabits" class="quick-grid"></div>
+</section>
+
+<!-- HABITS -->
+<section id="tab-habits" class="tab">
+<div class="section-title">ریتم زندگی من</div>
+<p class="hint">هر عادت هدف روزانه، واحد و استریک خودش را دارد. با + و − ثبت کن.</p>
+<div id="habitList" class="habit-list"></div>
+<button class="neon-btn full" onclick="openModal('habitModal')">+ ساخت عادت خاص جدید</button>
+</section>
+
+<!-- STATS -->
+<section id="tab-stats" class="tab">
+<div class="section-title">نمودار پیشرفت / پسرفت</div>
+<div id="trendCard" class="glass trend-card">...</div>
+<div class="glass chart-card">
+<h3>۷ روز اخیر (درصد موفقیت)</h3>
+<canvas id="chartWeek" height="180"></canvas>
+</div>
+<div class="glass chart-card">
+<h3>۳۰ روز اخیر (روند)</h3>
+<canvas id="chartMonth" height="140"></canvas>
+</div>
+<div class="glass chart-card">
+<h3>پایداری عادت‌ها (٪)</h3>
+<canvas id="chartHabits" height="180"></canvas>
+</div>
+<div class="two-cols">
+<button class="glass-btn" onclick="exportData()">⬇ خروجی JSON</button>
+<button class="glass-btn" onclick="document.getElementById('importFile').click()">⬆ ورود داده</button>
+<input type="file" id="importFile" accept=".json" hidden />
+</div>
+</section>
+
+<!-- MORE -->
+<section id="tab-more" class="tab">
+<div class="section-title">تنظیمات و دیتابیس</div>
+<div class="glass card">
+<h3>💾 دیتابیس سبک</h3>
+<p>داده‌ها در IndexedDB (معادل SQLite موبایل) + حافظه محلی ذخیره می‌شود. کاملاً آفلاین و بدون سرور.</p>
+<p>جدول‌ها: <code>tasks</code> ، <code>habits</code> ، <code>history</code> — ساختار SQLite در فایل <code>schema.sql</code> موجود است.</p>
+<div class="two-cols">
+<button class="glass-btn danger" onclick="resetAll()">حذف همه داده‌ها</button>
+<button class="glass-btn" onclick="seedDemo()">ریست با مثال باشگاه و کتاب</button>
+</div>
+</div>
+<div class="glass card">
+<h3>📲 نصب به‌صورت PWA</h3>
+<p>۱. فایل‌ها را روی هاست https یا لوکال‌هاست بگذار<br/>۲. در کروم: Add to Home Screen<br/>۳. برای آیکون حرفه‌ای، فایل <code>icon-512.png</code> کنار فایل‌ها بگذار</p>
+</div>
+<div class="glass card small">ساخته‌شده برای ریتم زندگی: تمرین، مطالعه، خواب، تغذیه و رشد 🚀</div>
+</section>
+</main>
+
+<nav class="bottomnav glass">
+<button data-tab="today" class="active">🏠<span>امروز</span></button>
+<button data-tab="habits">🔥<span>عادت‌ها</span></button>
+<button data-tab="stats">📊<span>آمار</span></button>
+<button data-tab="more">⚙️<span>بیشتر</span></button>
+</nav>
+</div>
+
+<!-- TASK MODAL -->
+<div id="taskModal" class="modal">
+<div class="modal-box glass">
+<h3>کار جدید</h3>
+<input id="taskTitle" placeholder="مثلاً سینه + جلو بازو (۴ ست)" maxlength="80" />
+<div class="row">
+<select id="taskCat">
+<option value="gym">🏋️ باشگاه</option>
+<option value="sport">🏃 ورزش هوازی</option>
+<option value="study">📚 مطالعه</option>
+<option value="work">💼 کار</option>
+<option value="health">💧 سلامت</option>
+<option value="personal">🌙 شخصی</option>
+</select>
+<select id="taskPri">
+<option value="low">اولویت کم</option>
+<option value="normal" selected>عادی</option>
+<option value="high">مهم 🔥</option>
+</select>
+</div>
+<div class="row">
+<input id="taskTime" type="time" value="18:00" />
+<button class="neon-btn" onclick="saveTask()">ثبت</button>
+<button class="glass-btn" onclick="closeModal('taskModal')">بستن</button>
+</div>
+</div>
+</div>
+
+<!-- HABIT MODAL -->
+<div id="habitModal" class="modal">
+<div class="modal-box glass">
+<h3>عادت جدید</h3>
+<input id="habitName" placeholder="مثلاً مدیتیشن، زبان، شنا..." maxlength="40" />
+<div class="row">
+<input id="habitUnit" placeholder="واحد: صفحه / دقیقه / لیوان / ست" />
+<input id="habitTarget" type="number" min="1" value="20" placeholder="هدف" />
+</div>
+<div class="row">
+<select id="habitIcon">
+<option value="🏋️">🏋️ باشگاه</option>
+<option value="📚">📚 کتاب</option>
+<option value="🏃">🏃 ورزش</option>
+<option value="💧">💧 آب</option>
+<option value="😴">😴 خواب</option>
+<option value="🧠">🧠 یادگیری</option>
+<option value="🧘">🧘 مدیتیشن</option>
+<option value="⭐">⭐ خاص</option>
+</select>
+<button class="neon-btn" onclick="saveHabit()">ساخت</button>
+<button class="glass-btn" onclick="closeModal('habitModal')">بستن</button>
+</div>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
